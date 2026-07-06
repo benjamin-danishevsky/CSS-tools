@@ -1,16 +1,10 @@
 import { useStore } from "zustand";
 import { useGridStore } from "../../store/gridStore";
 import { useTheme } from "../../lib/useTheme";
-
-const PRESETS = [
-  { key: "holy-grail", label: "Holy Grail" },
-  { key: "dashboard", label: "Dashboard" },
-  { key: "gallery", label: "Gallery" },
-] as const;
+import PresetMenu from "./PresetMenu";
 
 export default function Toolbar() {
   const reset = useGridStore((s) => s.reset);
-  const loadPreset = useGridStore((s) => s.loadPreset);
   const undo = useGridStore((s) => s.undo);
   const redo = useGridStore((s) => s.redo);
   const canUndo = useStore(
@@ -44,28 +38,7 @@ export default function Toolbar() {
           style={{ backgroundColor: "var(--color-border)" }}
         />
 
-        <div className="flex items-center gap-1.5">
-          <span
-            className="mr-1 text-[10px] font-semibold uppercase tracking-wider"
-            style={{ color: "var(--color-text-muted)" }}
-          >
-            Presets
-          </span>
-          {PRESETS.map((preset) => (
-            <button
-              key={preset.key}
-              data-testid={`preset-${preset.key}`}
-              onClick={() => loadPreset(preset.key)}
-              className="rounded-md px-2.5 py-1 text-xs font-medium transition-colors"
-              style={{
-                backgroundColor: "var(--color-accent-bg)",
-                color: "var(--color-accent)",
-              }}
-            >
-              {preset.label}
-            </button>
-          ))}
-        </div>
+        <PresetMenu />
       </div>
 
       <div className="flex items-center gap-2">

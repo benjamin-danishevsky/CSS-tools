@@ -30,10 +30,21 @@ test("builds a layout from the UI and reflects it in the code panel", async ({
 });
 
 test("loads a preset and shows named areas", async ({ page }) => {
+  await page.getByTestId("presets-btn").click();
   await page.getByTestId("preset-holy-grail").click();
   const code = page.getByTestId("code-output");
   await expect(code).toContainText("grid-template-columns: 200px 1fr 200px;");
   await expect(code).toContainText("grid-template-areas:");
+});
+
+test("loads a newly added preset (Kanban board)", async ({ page }) => {
+  await page.getByTestId("presets-btn").click();
+  await page.getByTestId("preset-kanban").click();
+  const code = page.getByTestId("code-output");
+  await expect(code).toContainText("grid-template-columns: 1fr 1fr 1fr;");
+  await expect(
+    page.getByTestId("grid-container").getByText("In Progress"),
+  ).toBeVisible();
 });
 
 test("copies the CSS to the clipboard", async ({ page, context }) => {

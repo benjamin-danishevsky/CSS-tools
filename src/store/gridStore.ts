@@ -271,9 +271,272 @@ function makeGalleryPreset(): Partial<GridState> {
   };
 }
 
+function makeAppShellPreset(): Partial<GridState> {
+  return {
+    columns: [
+      { id: makeTrackId(), value: 240, unit: "px" },
+      { id: makeTrackId(), value: 1, unit: "fr" },
+    ],
+    rows: [
+      { id: makeTrackId(), value: 0, unit: "auto" },
+      { id: makeTrackId(), value: 1, unit: "fr" },
+    ],
+    gap: { row: 0, column: 0 },
+    items: [
+      {
+        id: makeItemId(),
+        label: "Header",
+        color: ITEM_COLORS[0],
+        gridColumnStart: 1,
+        gridColumnEnd: 3,
+        gridRowStart: 1,
+        gridRowEnd: 2,
+      },
+      {
+        id: makeItemId(),
+        label: "Sidebar",
+        color: ITEM_COLORS[1],
+        gridColumnStart: 1,
+        gridColumnEnd: 2,
+        gridRowStart: 2,
+        gridRowEnd: 3,
+      },
+      {
+        id: makeItemId(),
+        label: "Main",
+        color: ITEM_COLORS[2],
+        gridColumnStart: 2,
+        gridColumnEnd: 3,
+        gridRowStart: 2,
+        gridRowEnd: 3,
+      },
+    ],
+    gridTemplateAreas: [
+      ["header", "header"],
+      ["sidebar", "main"],
+    ],
+    selectedItemId: null,
+  };
+}
+
+function makeBlogPreset(): Partial<GridState> {
+  return {
+    columns: [
+      { id: makeTrackId(), value: 2, unit: "fr" },
+      { id: makeTrackId(), value: 1, unit: "fr" },
+    ],
+    rows: [
+      { id: makeTrackId(), value: 0, unit: "auto" },
+      { id: makeTrackId(), value: 1, unit: "fr" },
+      { id: makeTrackId(), value: 0, unit: "auto" },
+    ],
+    gap: { row: 16, column: 16 },
+    items: [
+      {
+        id: makeItemId(),
+        label: "Header",
+        color: ITEM_COLORS[0],
+        gridColumnStart: 1,
+        gridColumnEnd: 3,
+        gridRowStart: 1,
+        gridRowEnd: 2,
+      },
+      {
+        id: makeItemId(),
+        label: "Article",
+        color: ITEM_COLORS[1],
+        gridColumnStart: 1,
+        gridColumnEnd: 2,
+        gridRowStart: 2,
+        gridRowEnd: 3,
+      },
+      {
+        id: makeItemId(),
+        label: "Sidebar",
+        color: ITEM_COLORS[2],
+        gridColumnStart: 2,
+        gridColumnEnd: 3,
+        gridRowStart: 2,
+        gridRowEnd: 3,
+      },
+      {
+        id: makeItemId(),
+        label: "Footer",
+        color: ITEM_COLORS[3],
+        gridColumnStart: 1,
+        gridColumnEnd: 3,
+        gridRowStart: 3,
+        gridRowEnd: 4,
+      },
+    ],
+    gridTemplateAreas: [
+      ["header", "header"],
+      ["article", "sidebar"],
+      ["footer", "footer"],
+    ],
+    selectedItemId: null,
+  };
+}
+
+function makeSplitScreenPreset(): Partial<GridState> {
+  return {
+    columns: [
+      { id: makeTrackId(), value: 1, unit: "fr" },
+      { id: makeTrackId(), value: 1, unit: "fr" },
+    ],
+    rows: [{ id: makeTrackId(), value: 1, unit: "fr" }],
+    gap: { row: 0, column: 0 },
+    items: [
+      {
+        id: makeItemId(),
+        label: "Left",
+        color: ITEM_COLORS[0],
+        gridColumnStart: 1,
+        gridColumnEnd: 2,
+        gridRowStart: 1,
+        gridRowEnd: 2,
+      },
+      {
+        id: makeItemId(),
+        label: "Right",
+        color: ITEM_COLORS[1],
+        gridColumnStart: 2,
+        gridColumnEnd: 3,
+        gridRowStart: 1,
+        gridRowEnd: 2,
+      },
+    ],
+    gridTemplateAreas: null,
+    selectedItemId: null,
+  };
+}
+
+function makeHeroLandingPreset(): Partial<GridState> {
+  return {
+    columns: [
+      { id: makeTrackId(), value: 1, unit: "fr" },
+      { id: makeTrackId(), value: 1, unit: "fr" },
+      { id: makeTrackId(), value: 1, unit: "fr" },
+    ],
+    rows: [
+      { id: makeTrackId(), value: 0, unit: "auto" },
+      { id: makeTrackId(), value: 1, unit: "fr" },
+      { id: makeTrackId(), value: 0, unit: "auto" },
+    ],
+    gap: { row: 16, column: 16 },
+    items: [
+      {
+        id: makeItemId(),
+        label: "Hero",
+        color: ITEM_COLORS[0],
+        gridColumnStart: 1,
+        gridColumnEnd: 4,
+        gridRowStart: 1,
+        gridRowEnd: 2,
+      },
+      {
+        id: makeItemId(),
+        label: "Feature 1",
+        color: ITEM_COLORS[1],
+        gridColumnStart: 1,
+        gridColumnEnd: 2,
+        gridRowStart: 2,
+        gridRowEnd: 3,
+      },
+      {
+        id: makeItemId(),
+        label: "Feature 2",
+        color: ITEM_COLORS[2],
+        gridColumnStart: 2,
+        gridColumnEnd: 3,
+        gridRowStart: 2,
+        gridRowEnd: 3,
+      },
+      {
+        id: makeItemId(),
+        label: "Feature 3",
+        color: ITEM_COLORS[3],
+        gridColumnStart: 3,
+        gridColumnEnd: 4,
+        gridRowStart: 2,
+        gridRowEnd: 3,
+      },
+      {
+        id: makeItemId(),
+        label: "Footer",
+        color: ITEM_COLORS[4],
+        gridColumnStart: 1,
+        gridColumnEnd: 4,
+        gridRowStart: 3,
+        gridRowEnd: 4,
+      },
+    ],
+    gridTemplateAreas: [
+      ["hero", "hero", "hero"],
+      ["feature-1", "feature-2", "feature-3"],
+      ["footer", "footer", "footer"],
+    ],
+    selectedItemId: null,
+  };
+}
+
+function makePricingPreset(): Partial<GridState> {
+  const tiers = ["Basic", "Pro", "Enterprise"];
+  return {
+    columns: [
+      { id: makeTrackId(), value: 1, unit: "fr" },
+      { id: makeTrackId(), value: 1, unit: "fr" },
+      { id: makeTrackId(), value: 1, unit: "fr" },
+    ],
+    rows: [{ id: makeTrackId(), value: 1, unit: "fr" }],
+    gap: { row: 16, column: 16 },
+    items: tiers.map((label, i) => ({
+      id: makeItemId(),
+      label,
+      color: ITEM_COLORS[i],
+      gridColumnStart: i + 1,
+      gridColumnEnd: i + 2,
+      gridRowStart: 1,
+      gridRowEnd: 2,
+    })),
+    gridTemplateAreas: null,
+    selectedItemId: null,
+  };
+}
+
+function makeKanbanPreset(): Partial<GridState> {
+  const columnsLabels = ["To Do", "In Progress", "Done"];
+  return {
+    columns: [
+      { id: makeTrackId(), value: 1, unit: "fr" },
+      { id: makeTrackId(), value: 1, unit: "fr" },
+      { id: makeTrackId(), value: 1, unit: "fr" },
+    ],
+    rows: [{ id: makeTrackId(), value: 1, unit: "fr" }],
+    gap: { row: 16, column: 16 },
+    items: columnsLabels.map((label, i) => ({
+      id: makeItemId(),
+      label,
+      color: ITEM_COLORS[i],
+      gridColumnStart: i + 1,
+      gridColumnEnd: i + 2,
+      gridRowStart: 1,
+      gridRowEnd: 2,
+    })),
+    gridTemplateAreas: null,
+    selectedItemId: null,
+  };
+}
+
 const PRESETS = {
   "holy-grail": makeHolyGrailPreset,
+  "app-shell": makeAppShellPreset,
   dashboard: makeDashboardPreset,
+  blog: makeBlogPreset,
+  "split-screen": makeSplitScreenPreset,
+  "hero-landing": makeHeroLandingPreset,
+  pricing: makePricingPreset,
+  kanban: makeKanbanPreset,
   gallery: makeGalleryPreset,
 } as const;
 

@@ -66,6 +66,7 @@ describe("App — full build flow (UI only)", () => {
 
   it("stays in sync when a preset is loaded from the toolbar", async () => {
     render(<App />);
+    await userEvent.click(screen.getByTestId("presets-btn"));
     await userEvent.click(screen.getByTestId("preset-holy-grail"));
 
     const codeOutput = screen.getByTestId("code-output");

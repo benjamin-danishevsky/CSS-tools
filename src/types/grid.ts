@@ -35,6 +35,17 @@ export interface GridState {
   gridTemplateAreas: string[][] | null;
 }
 
+export type PresetKey =
+  | "holy-grail"
+  | "app-shell"
+  | "dashboard"
+  | "blog"
+  | "split-screen"
+  | "hero-landing"
+  | "pricing"
+  | "kanban"
+  | "gallery";
+
 export interface GridActions {
   addColumn: (track?: Partial<TrackDefinition>) => void;
   removeColumn: (id: string) => void;
@@ -59,7 +70,7 @@ export interface GridActions {
   setGridTemplateAreas: (areas: string[][] | null) => void;
   updateAreaName: (row: number, col: number, name: string) => void;
   reset: () => void;
-  loadPreset: (preset: "holy-grail" | "dashboard" | "gallery") => void;
+  loadPreset: (preset: PresetKey) => void;
   undo: () => void;
   redo: () => void;
 }

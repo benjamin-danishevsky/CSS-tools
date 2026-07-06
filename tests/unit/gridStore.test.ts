@@ -294,6 +294,80 @@ describe("gridStore", () => {
       expect(state.columns.length).toBeGreaterThan(0);
       expect(state.items.length).toBeGreaterThan(0);
     });
+
+    it("app-shell preset loads a header + sidebar + main layout", () => {
+      act(() => getState().loadPreset("app-shell"));
+      const state = getState();
+      expect(state.columns).toHaveLength(2);
+      expect(state.items.length).toBeGreaterThanOrEqual(3);
+      expect(state.gridTemplateAreas).not.toBeNull();
+    });
+
+    it("blog preset loads a content + sidebar layout", () => {
+      act(() => getState().loadPreset("blog"));
+      const state = getState();
+      expect(state.columns).toHaveLength(2);
+      expect(state.rows).toHaveLength(3);
+      expect(state.items.length).toBeGreaterThanOrEqual(4);
+    });
+
+    it("split-screen preset loads two equal halves", () => {
+      act(() => getState().loadPreset("split-screen"));
+      const state = getState();
+      expect(state.columns).toHaveLength(2);
+      expect(state.rows).toHaveLength(1);
+      expect(state.items).toHaveLength(2);
+    });
+
+    it("hero-landing preset loads a hero + feature row", () => {
+      act(() => getState().loadPreset("hero-landing"));
+      const state = getState();
+      expect(state.columns).toHaveLength(3);
+      expect(state.rows).toHaveLength(3);
+      expect(state.items.length).toBeGreaterThanOrEqual(5);
+    });
+
+    it("pricing preset loads three tier columns", () => {
+      act(() => getState().loadPreset("pricing"));
+      const state = getState();
+      expect(state.columns).toHaveLength(3);
+      expect(state.items).toHaveLength(3);
+    });
+
+    it("kanban preset loads three board columns", () => {
+      act(() => getState().loadPreset("kanban"));
+      const state = getState();
+      expect(state.columns).toHaveLength(3);
+      expect(state.items).toHaveLength(3);
+    });
+
+    it("every preset produces items positioned within its grid", () => {
+      const presets = [
+        "holy-grail",
+        "app-shell",
+        "dashboard",
+        "blog",
+        "split-screen",
+        "hero-landing",
+        "pricing",
+        "kanban",
+        "gallery",
+      ] as const;
+      presets.forEach((preset) => {
+        act(() => getState().loadPreset(preset));
+        const state = getState();
+        const cols = state.columns.length;
+        const rows = state.rows.length;
+        state.items.forEach((item) => {
+          expect(item.gridColumnStart).toBeGreaterThanOrEqual(1);
+          expect(item.gridColumnEnd).toBeLessThanOrEqual(cols + 1);
+          expect(item.gridColumnEnd).toBeGreaterThan(item.gridColumnStart);
+          expect(item.gridRowStart).toBeGreaterThanOrEqual(1);
+          expect(item.gridRowEnd).toBeLessThanOrEqual(rows + 1);
+          expect(item.gridRowEnd).toBeGreaterThan(item.gridRowStart);
+        });
+      });
+    });
   });
 
   describe("undo/redo", () => {

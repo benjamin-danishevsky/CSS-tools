@@ -33,24 +33,35 @@ describe("Toolbar", () => {
   });
 
   describe("presets", () => {
-    it("loads the Holy Grail preset", async () => {
+    it("loads the Holy Grail preset from the presets menu", async () => {
       render(<Toolbar />);
+      await userEvent.click(screen.getByTestId("presets-btn"));
       await userEvent.click(screen.getByTestId("preset-holy-grail"));
       expect(useGridStore.getState().columns).toHaveLength(3);
       expect(useGridStore.getState().items).toHaveLength(5);
     });
 
-    it("loads the Dashboard preset", async () => {
+    it("loads the Dashboard preset from the presets menu", async () => {
       render(<Toolbar />);
+      await userEvent.click(screen.getByTestId("presets-btn"));
       await userEvent.click(screen.getByTestId("preset-dashboard"));
       expect(useGridStore.getState().columns).toHaveLength(4);
       expect(useGridStore.getState().items.length).toBeGreaterThan(0);
     });
 
-    it("loads the Gallery preset", async () => {
+    it("loads the Gallery preset from the presets menu", async () => {
       render(<Toolbar />);
+      await userEvent.click(screen.getByTestId("presets-btn"));
       await userEvent.click(screen.getByTestId("preset-gallery"));
       expect(useGridStore.getState().items).toHaveLength(6);
+    });
+
+    it("loads a newly added preset (Kanban) from the presets menu", async () => {
+      render(<Toolbar />);
+      await userEvent.click(screen.getByTestId("presets-btn"));
+      await userEvent.click(screen.getByTestId("preset-kanban"));
+      expect(useGridStore.getState().columns).toHaveLength(3);
+      expect(useGridStore.getState().items).toHaveLength(3);
     });
   });
 
