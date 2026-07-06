@@ -277,6 +277,13 @@ const PRESETS = {
   gallery: makeGalleryPreset,
 } as const;
 
+// Explicitly typed holder for the temporal (undo/redo) store. Annotating it
+// here — independent of `useGridStore` — lets the store's `undo`/`redo` actions
+// reference it without a circular inference on the store's own type.
+let temporalStore: {
+  getState: () => { undo: () => void; redo: () => void };
+};
+
 export const useGridStore = create<GridStore>()(
   temporal(
     (set) => ({
@@ -378,15 +385,27 @@ export const useGridStore = create<GridStore>()(
         set({ ...makeInitialState(), ...factory() });
       },
 
-      undo: () => useGridStore.temporal.getState().undo(),
-      redo: () => useGridStore.temporal.getState().redo(),
+      undo: () => temporalStore.getState().undo(),
+      redo: () => temporalStore.getState().redo(),
     }),
     {
       limit: 50,
-      partialize: (state) => {
-        const { ...rest } = state;
-        return rest;
-      },
+      // Track only the grid data — not the transient selection or the
+      // (stable) action functions — so selecting an item is not an undo step.
+      partialize: (state) => ({
+        columns: state.columns,
+        rows: state.rows,
+        gap: state.gap,
+        justifyItems: state.justifyItems,
+        alignItems: state.alignItems,
+        justifyContent: state.justifyContent,
+        alignContent: state.alignContent,
+        items: state.items,
+        gridTemplateAreas: state.gridTemplateAreas,
+      }),
     },
   ),
 );
+
+// Resolve the temporal store after `useGridStore` is fully typed.
+temporalStore = useGridStore.temporal;

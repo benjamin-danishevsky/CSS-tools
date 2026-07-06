@@ -20,6 +20,10 @@
   --color-danger: #e17055;
   --color-canvas-bg: #fafbfc;
   --color-canvas-grid: #e2e4e9;
+  --color-syntax-selector: #d6336c;
+  --color-syntax-property: #6c5ce7;
+  --color-syntax-value: #0b7285;
+  --color-syntax-punctuation: #868e96;
   --radius-sm: 6px;
   --radius-md: 10px;
   --radius-lg: 14px;
@@ -46,6 +50,10 @@
   --color-danger: #ff7675;
   --color-canvas-bg: #1a1a20;
   --color-canvas-grid: #2e2e38;
+  --color-syntax-selector: #f783ac;
+  --color-syntax-property: #a29bfe;
+  --color-syntax-value: #63e6be;
+  --color-syntax-punctuation: #adb5bd;
   --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.3);
   --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.4);
   --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.5);

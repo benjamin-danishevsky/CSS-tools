@@ -148,12 +148,40 @@ Split into 4 focused sub-components for maintainability:
 ---
 
 ## Phase 4: Code panel
-**Date:**
-**Prompt:**
-**First output:**
-**Iterations:**
-**Time:**
-**Verdict:**
+**Date:** 2026-07-05
+**Prompt:** "continue with my project with phase 4" (first phase on Opus 4.8)
+
+**First output (TDD — RED phase):**
+Wrote 18 tests before implementation:
+- `htmlGenerator.test.ts` (8 unit tests): container wrapper, one div per item, sequential class numbering matching the CSS, label as text content, 2-space indentation, empty container, HTML escaping (script tags and ampersands)
+- `CodePanel.test.tsx` (10 component tests): renders CSS, live updates on store change, syntax highlighting tokens present, monospace font, copy button, clipboard copy, "Copied!" feedback, CSS/HTML tab switching, HTML copy
+
+All 18 tests failed (RED confirmed).
+
+**Implementation:**
+- `htmlGenerator.ts` — pure gridState → HTML string with escaped labels and class names matching cssGenerator's numbering
+- `highlight.tsx` — CSS tokenizer emitting themed spans (selector/property/value/punctuation) with `data-token` attributes; handles selectors, declarations, closing braces, and grid-template-areas string rows; reconstructs to identical text content
+- `CodePanel.tsx` — tabbed CSS/HTML panel subscribing to the whole store for live updates, copy-to-clipboard with transient "Copied!" feedback, monospace output
+- `index.css` — added syntax highlight color variables for both light and dark themes
+
+**Iterations:** All 18 tests passed on first implementation — BUT `npm run build` then failed with a circular type-inference error (TS7022/7023) in gridStore.ts, cascading into "implicit any" errors across the Sidebar selectors.
+
+Root cause & catch: the store's `undo`/`redo` referenced `useGridStore.temporal` *inside its own initializer*, creating a circular dependency on the store's own inferred type. This had existed since Phase 1 but went undetected because `npm run typecheck` ran `tsc --noEmit` against the root solution-style tsconfig (`files: []` + references), which checks zero files. Only `tsc -b` (used by `npm run build`) actually type-checks the app.
+
+Fixes applied:
+1. Broke the circularity with a `let temporalStore` holder carrying an explicit minimal type annotation (`{ getState: () => { undo, redo } }`), assigned `useGridStore.temporal` after store creation. The initializer now references the pre-typed holder, not the store's own type.
+2. Improved `partialize` to track only grid data (not transient `selectedItemId` or action fns) so selecting an item is not an undo step.
+3. Changed the `typecheck` script from `tsc --noEmit` to `tsc -b` so this class of error is caught going forward.
+
+**Verification:**
+- `npm test` — 119/119 passed (18 new)
+- `npm run typecheck` (now real `tsc -b`) — 0 errors
+- `npm run build` — clean (214 KB JS)
+- Live Playwright visual check skipped per standing "never start web server" rule; build + component tests cover it.
+
+**Time:** ~20 minutes (incl. debugging the build regression)
+
+**Verdict:** The feature code (generator, highlighter, tabbed panel) was correct first try — all 18 tests green immediately. The valuable catch was a *tooling* gap: the mandated `typecheck` command was silently checking nothing, hiding a real circular-type bug since Phase 1. Running the full `build` (not just the shortcut typecheck) surfaced it. Lesson logged: `tsc --noEmit` against a Vite solution-style root config is a no-op — always type-check with `tsc -b`. Fixed the script so every future phase gets genuine coverage.
 
 ---
 
