@@ -1,0 +1,64 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --color-bg: #ffffff;
+  --color-bg-secondary: #f8f9fa;
+  --color-bg-tertiary: #f0f1f3;
+  --color-text: #1a1a2e;
+  --color-text-secondary: #4a4a68;
+  --color-text-muted: #8888a0;
+  --color-border: #e2e4e9;
+  --color-border-hover: #c8cad0;
+  --color-accent: #6c5ce7;
+  --color-accent-hover: #5a4bd1;
+  --color-accent-light: #a29bfe;
+  --color-accent-bg: #f0eeff;
+  --color-success: #00b894;
+  --color-warning: #fdcb6e;
+  --color-danger: #e17055;
+  --color-canvas-bg: #fafbfc;
+  --color-canvas-grid: #e2e4e9;
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 14px;
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.08);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.1);
+  --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.12);
+}
+
+.dark {
+  --color-bg: #16161a;
+  --color-bg-secondary: #1e1e24;
+  --color-bg-tertiary: #28282e;
+  --color-text: #fffffe;
+  --color-text-secondary: #b8b8cc;
+  --color-text-muted: #72728a;
+  --color-border: #2e2e38;
+  --color-border-hover: #44444e;
+  --color-accent: #7c6ff7;
+  --color-accent-hover: #8f84f9;
+  --color-accent-light: #6c5ce7;
+  --color-accent-bg: #2a2640;
+  --color-success: #00d2a0;
+  --color-warning: #feca57;
+  --color-danger: #ff7675;
+  --color-canvas-bg: #1a1a20;
+  --color-canvas-grid: #2e2e38;
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.4);
+  --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.5);
+}
+
+body {
+  margin: 0;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  background-color: var(--color-bg);
+  color: var(--color-text);
+  min-width: 1024px;
+}
+
+* {
+  box-sizing: border-box;
+}

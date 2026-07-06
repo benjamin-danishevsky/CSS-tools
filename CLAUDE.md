@@ -8,7 +8,11 @@ A single-page React app that lets users visually build CSS Grid layouts by dragg
 - TypeScript (strict mode)
 - Tailwind CSS 3 for app chrome only (NOT for the grid output — output must be plain CSS)
 - zustand for state (single store, no prop drilling)
-- react-dnd or pointer events for drag interactions
+- zundo (zustand temporal middleware) for undo/redo
+- Pointer events for drag interactions (no drag library)
+- CSS custom properties for dark/light theming
+- Vitest + React Testing Library for unit/component tests
+- Playwright for E2E tests
 
 ## Architecture
 
@@ -18,11 +22,12 @@ src/
     Canvas/          # The visual grid. Renders grid lines, items, drag handles.
     Sidebar/         # Property controls: template-rows, template-columns, gap, alignment.
     CodePanel/       # Live CSS output with syntax highlighting and copy button.
-    Toolbar/         # Presets, reset, undo/redo buttons.
+    Toolbar/         # Presets, reset, undo/redo, dark mode toggle, export buttons.
   store/
     gridStore.ts     # Single zustand store. All grid state lives here.
   lib/
     cssGenerator.ts  # Pure function: gridState → CSS string. No side effects.
+    htmlGenerator.ts # Pure function: gridState → HTML string with matching class names.
     gridParser.ts    # Parse track definitions (e.g., "1fr 200px auto") into typed arrays.
   types/
     grid.ts          # GridState, GridItem, TrackDefinition, AlignmentValue types.
@@ -33,8 +38,8 @@ src/
 ## Core data model
 
 ```ts
-type TrackUnit = 'fr' | 'px' | '%' | 'auto' | 'minmax';
-type TrackDefinition = { value: number; unit: TrackUnit };
+type TrackUnit = 'fr' | 'px' | '%' | 'auto';
+type TrackDefinition = { id: string; value: number; unit: TrackUnit };
 
 interface GridItem {
   id: string;
@@ -43,19 +48,24 @@ interface GridItem {
   gridColumnEnd: number;
   gridRowStart: number;
   gridRowEnd: number;
-  justifySelf?: 'start' | 'end' | 'center' | 'stretch';
-  alignSelf?: 'start' | 'end' | 'center' | 'stretch';
+  justifySelf?: AlignmentValue;
+  alignSelf?: AlignmentValue;
 }
+
+type AlignmentValue = 'start' | 'end' | 'center' | 'stretch';
+type ContentAlignmentValue = AlignmentValue | 'space-between' | 'space-around' | 'space-evenly';
 
 interface GridState {
   columns: TrackDefinition[];
   rows: TrackDefinition[];
   gap: { row: number; column: number };
-  justifyItems: string;
-  alignItems: string;
-  justifyContent: string;
-  alignContent: string;
+  justifyItems: AlignmentValue;
+  alignItems: AlignmentValue;
+  justifyContent: ContentAlignmentValue;
+  alignContent: ContentAlignmentValue;
   items: GridItem[];
+  selectedItemId: string | null;
+  gridTemplateAreas: string[][] | null; // null = not using named areas
 }
 ```
 
@@ -67,6 +77,10 @@ interface GridState {
 - **One source of truth.** The zustand store drives both the canvas and the code panel. Never let them diverge.
 - **No premature optimization.** Ship working features before polishing animations.
 - **Accessibility baseline.** All controls keyboard-accessible. Visible focus rings. Buttons have labels.
+- **Desktop-only.** Minimum viewport 1024px. No responsive breakpoints needed.
+- **Pointer events only.** No drag libraries. Use native pointer events for all drag interactions.
+- **Dark mode via CSS custom properties.** Default to `prefers-color-scheme`. Manual toggle in toolbar. Persist preference in `localStorage`.
+- **Colorful/playful design.** Figma/Framer-inspired aesthetic — vibrant accent colors, rounded corners, visual personality. Not a gray dev-tool look.
 
 ## CSS output format
 
@@ -75,6 +89,10 @@ interface GridState {
   display: grid;
   grid-template-columns: 1fr 2fr 1fr;
   grid-template-rows: auto 1fr auto;
+  grid-template-areas:
+    "header header header"
+    "sidebar main main"
+    "footer footer footer";
   gap: 16px;
   justify-items: stretch;
   align-items: stretch;
@@ -83,7 +101,17 @@ interface GridState {
 .item-1 {
   grid-column: 1 / 3;
   grid-row: 1 / 2;
+  grid-area: header; /* only when named areas are used */
 }
+```
+
+## HTML export format
+
+```html
+<div class="container">
+  <div class="item-1">Item 1</div>
+  <div class="item-2">Item 2</div>
+</div>
 ```
 
 ## Commands
@@ -91,9 +119,32 @@ interface GridState {
 - `npm run build` — production build
 - `npm run lint` — eslint
 - `npm run typecheck` — tsc --noEmit
+- `npm test` — run Vitest unit/component tests
+- `npm run test:e2e` — run Playwright E2E tests
 
 ## Testing approach
-No test framework. Validate by:
+Full TDD with Vitest + React Testing Library + Playwright.
+
+**Unit tests** (Vitest):
+- `cssGenerator.ts` — gridState → correct CSS string
+- `htmlGenerator.ts` — gridState → correct HTML string
+- `gridParser.ts` — parse track strings into typed arrays
+- `gridStore.ts` — all actions produce correct state transitions, undo/redo works
+
+**Component tests** (Vitest + RTL):
+- Sidebar controls update the store
+- CodePanel reflects store changes
+- Canvas renders correct grid styles
+
+**E2E tests** (Playwright):
+- User builds a layout from scratch using only the UI
+- Preset buttons load correct configurations
+- Copy CSS button works
+- Export HTML button works
+- Dark mode toggle works and persists
+- Undo/redo buttons work
+
+**Validation criteria** (still applies):
 1. Does the canvas match the CSS output when pasted into a blank HTML file?
 2. Do all controls update both canvas and code panel?
 3. Can the user go from zero to a complete layout without touching code?
@@ -102,4 +153,6 @@ No test framework. Validate by:
 - Add a backend or database
 - Use CSS-in-JS (styled-components, emotion). Tailwind for app UI, inline styles for the grid canvas.
 - Over-engineer: no router, no i18n, no analytics
+- Add responsive breakpoints — this is a desktop-only tool
+- Support `minmax()` track definitions (out of scope — the two-argument shape doesn't fit the current data model)
 - Add features not listed here without asking

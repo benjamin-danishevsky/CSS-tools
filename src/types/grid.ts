@@ -1,4 +1,4 @@
-export type TrackUnit = 'fr' | 'px' | '%' | 'auto';
+export type TrackUnit = "fr" | "px" | "%" | "auto";
 
 export interface TrackDefinition {
   id: string;
@@ -6,8 +6,9 @@ export interface TrackDefinition {
   unit: TrackUnit;
 }
 
-export type AlignmentValue = 'start' | 'end' | 'center' | 'stretch';
-export type ContentAlignmentValue = AlignmentValue | 'space-between' | 'space-around' | 'space-evenly';
+export type AlignmentValue = "start" | "end" | "center" | "stretch";
+export type ContentAlignmentValue =
+  AlignmentValue | "space-between" | "space-around" | "space-evenly";
 
 export interface GridItem {
   id: string;
@@ -31,6 +32,7 @@ export interface GridState {
   alignContent: ContentAlignmentValue;
   items: GridItem[];
   selectedItemId: string | null;
+  gridTemplateAreas: string[][] | null;
 }
 
 export interface GridActions {
@@ -38,18 +40,28 @@ export interface GridActions {
   removeColumn: (id: string) => void;
   addRow: (track?: Partial<TrackDefinition>) => void;
   removeRow: (id: string) => void;
-  updateTrack: (type: 'columns' | 'rows', id: string, update: Partial<TrackDefinition>) => void;
-  setGap: (gap: Partial<GridState['gap']>) => void;
+  updateTrack: (
+    type: "columns" | "rows",
+    id: string,
+    update: Partial<TrackDefinition>,
+  ) => void;
+  setGap: (gap: Partial<GridState["gap"]>) => void;
   addItem: () => void;
   updateItem: (id: string, update: Partial<GridItem>) => void;
   removeItem: (id: string) => void;
   selectItem: (id: string | null) => void;
-  setAlignment: <K extends 'justifyItems' | 'alignItems' | 'justifyContent' | 'alignContent'>(
+  setAlignment: <
+    K extends "justifyItems" | "alignItems" | "justifyContent" | "alignContent",
+  >(
     property: K,
-    value: GridState[K]
+    value: GridState[K],
   ) => void;
+  setGridTemplateAreas: (areas: string[][] | null) => void;
+  updateAreaName: (row: number, col: number, name: string) => void;
   reset: () => void;
-  loadPreset: (preset: 'holy-grail' | 'dashboard' | 'gallery') => void;
+  loadPreset: (preset: "holy-grail" | "dashboard" | "gallery") => void;
+  undo: () => void;
+  redo: () => void;
 }
 
 export type GridStore = GridState & GridActions;
