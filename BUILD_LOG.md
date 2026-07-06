@@ -186,12 +186,39 @@ Fixes applied:
 ---
 
 ## Phase 5: Layout + polish
-**Date:**
-**Prompt:**
-**First output:**
-**Iterations:**
-**Time:**
-**Verdict:**
+**Date:** 2026-07-05
+**Prompt:** "commit with a detailed commit message and push, then go to the next phase"
+
+**Context:** The three-panel layout (Sidebar | Canvas | CodePanel) was already composed in App.tsx during Phases 0/2, so Phase 5's real work was building out the Toolbar (previously a brand-only placeholder) plus the canvas background pattern.
+
+**First output (TDD — RED phase):**
+Wrote 14 component tests for Toolbar before implementation:
+- Brand renders
+- Reset button clears to default 3x3 (0 items)
+- 3 preset buttons load correct configs (holy-grail: 3 cols/5 items, dashboard: 4 cols, gallery: 6 items)
+- Undo disabled with no history, enabled after a change, reverts on click
+- Redo disabled with no future, re-applies on click
+- Dark mode toggle: renders, adds/removes `dark` class, persists to localStorage
+
+13 failed, 1 passed (the brand text existed in the placeholder) — RED confirmed.
+
+**Implementation:**
+- `useTheme.ts` — hook managing the `dark` class on documentElement + localStorage persistence, initialized from current DOM state
+- `Toolbar.tsx` — full toolbar: brand, preset buttons (wired to loadPreset), undo/redo buttons with reactive disabled state via `useStore(useGridStore.temporal, ...)` reading pastStates/futureStates length, Reset, and dark-mode toggle. Colorful/playful styling per the design direction (accent-tinted preset chips, icon buttons).
+- `Canvas.tsx` — added a subtle radial-gradient dot pattern to the canvas background so grid boundaries are visible even with no items.
+
+**Iterations:** 0 — all 14 tests passed on first implementation.
+
+**Verification:**
+- `npx vitest run tests/component/Toolbar.test.tsx` — 14/14 passed
+- Full suite: 133/133 passed (no regressions)
+- `npm run typecheck` (tsc -b) — 0 errors
+- `npm run build` — clean (217 KB JS)
+- Live Playwright visual check skipped per standing "never start web server" rule.
+
+**Time:** ~10 minutes
+
+**Verdict:** Smooth phase, zero iteration. The reactive undo/redo disabled-state was the interesting part — it subscribes directly to zundo's temporal store via zustand's `useStore` hook to read pastStates/futureStates length, which "just worked" now that the store's types were fixed in Phase 4. Keeping the theme logic in a dedicated `useTheme` hook kept the Toolbar declarative and made the dark-mode behavior trivially testable via jsdom's classList + localStorage. The app is now fully interactive end-to-end (all panels driven by the single store).
 
 ---
 

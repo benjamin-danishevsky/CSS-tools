@@ -37,7 +37,12 @@ export default function Canvas() {
   return (
     <section
       className="flex flex-1 items-center justify-center overflow-auto p-6"
-      style={{ backgroundColor: "var(--color-canvas-bg)" }}
+      style={{
+        backgroundColor: "var(--color-canvas-bg)",
+        backgroundImage:
+          "radial-gradient(circle, var(--color-canvas-grid) 1px, transparent 1px)",
+        backgroundSize: "20px 20px",
+      }}
     >
       <div
         data-testid="grid-container"
