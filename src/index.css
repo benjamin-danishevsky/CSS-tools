@@ -70,3 +70,13 @@ body {
 * {
   box-sizing: border-box;
 }
+
+/* Visible keyboard focus for all interactive controls (WCAG 2.4.7). */
+button:focus-visible,
+input:focus-visible,
+select:focus-visible,
+[tabindex]:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+  border-radius: var(--radius-sm);
+}

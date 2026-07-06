@@ -208,124 +208,179 @@ export default function Canvas() {
       }}
     >
       <div
-        ref={gridRef}
-        data-testid="grid-container"
-        className="w-full h-full"
+        className="h-full w-full"
         style={{
           display: "grid",
-          gridTemplateColumns,
-          gridTemplateRows,
-          gap: gapValue,
-          minHeight: 300,
-          position: "relative",
+          gridTemplateColumns: "auto 1fr",
+          gridTemplateRows: "auto 1fr",
+          gap: 6,
         }}
       >
-        {cells}
+        {/* corner spacer */}
+        <div />
 
-        {items.map((item) => {
-          const isSelected = item.id === selectedItemId;
-          return (
+        {/* column size labels — aligned above each column */}
+        <div
+          style={{
+            display: "grid",
+            gridTemplateColumns,
+            columnGap: gap.column,
+          }}
+        >
+          {columns.map((col) => (
             <div
-              key={item.id}
-              data-testid={`grid-item-${item.id}`}
-              onClick={() => selectItem(item.id)}
-              onPointerDown={(e) => onItemPointerDown(e, item)}
-              onPointerMove={onItemPointerMove}
-              onPointerUp={onItemPointerUp}
-              className="flex flex-col items-center justify-center transition-shadow"
-              style={{
-                gridColumn: `${item.gridColumnStart} / ${item.gridColumnEnd}`,
-                gridRow: `${item.gridRowStart} / ${item.gridRowEnd}`,
-                backgroundColor: item.color,
-                borderRadius: "var(--radius-md)",
-                padding: "8px 12px",
-                color: "#fff",
-                fontWeight: 600,
-                fontSize: 13,
-                zIndex: 1,
-                cursor: "grab",
-                touchAction: "none",
-                boxShadow: isSelected
-                  ? "0 0 0 3px var(--color-accent), var(--shadow-md)"
-                  : "var(--shadow-sm)",
-                outline: isSelected
-                  ? "2px solid var(--color-accent-light)"
-                  : "none",
-              }}
+              key={`col-label-${col.id}`}
+              data-testid={`col-label-${col.id}`}
+              className="truncate text-center font-mono text-[11px] font-semibold"
+              style={{ color: "var(--color-text-muted)" }}
+              title={`Column: ${trackToString(col)}`}
             >
-              <span>{item.label}</span>
-              <span
+              {trackToString(col)}
+            </div>
+          ))}
+        </div>
+
+        {/* row size labels — aligned beside each row */}
+        <div
+          style={{
+            display: "grid",
+            gridTemplateRows,
+            rowGap: gap.row,
+          }}
+        >
+          {rows.map((row) => (
+            <div
+              key={`row-label-${row.id}`}
+              data-testid={`row-label-${row.id}`}
+              className="flex items-center justify-center pr-1 font-mono text-[11px] font-semibold"
+              style={{ color: "var(--color-text-muted)" }}
+              title={`Row: ${trackToString(row)}`}
+            >
+              {trackToString(row)}
+            </div>
+          ))}
+        </div>
+
+        <div
+          ref={gridRef}
+          data-testid="grid-container"
+          className="h-full w-full"
+          style={{
+            display: "grid",
+            gridTemplateColumns,
+            gridTemplateRows,
+            gap: gapValue,
+            minHeight: 300,
+            position: "relative",
+          }}
+        >
+          {cells}
+
+          {items.map((item) => {
+            const isSelected = item.id === selectedItemId;
+            return (
+              <div
+                key={item.id}
+                data-testid={`grid-item-${item.id}`}
+                onClick={() => selectItem(item.id)}
+                onPointerDown={(e) => onItemPointerDown(e, item)}
+                onPointerMove={onItemPointerMove}
+                onPointerUp={onItemPointerUp}
+                className="flex flex-col items-center justify-center transition-shadow"
                 style={{
-                  fontSize: 11,
-                  opacity: 0.8,
-                  fontWeight: 400,
-                  marginTop: 2,
+                  gridColumn: `${item.gridColumnStart} / ${item.gridColumnEnd}`,
+                  gridRow: `${item.gridRowStart} / ${item.gridRowEnd}`,
+                  backgroundColor: item.color,
+                  borderRadius: "var(--radius-md)",
+                  padding: "8px 12px",
+                  color: "#fff",
+                  fontWeight: 600,
+                  fontSize: 13,
+                  zIndex: 1,
+                  cursor: "grab",
+                  touchAction: "none",
+                  boxShadow: isSelected
+                    ? "0 0 0 3px var(--color-accent), var(--shadow-md)"
+                    : "var(--shadow-sm)",
+                  outline: isSelected
+                    ? "2px solid var(--color-accent-light)"
+                    : "none",
                 }}
               >
-                col {item.gridColumnStart}/{item.gridColumnEnd}, row{" "}
-                {item.gridRowStart}/{item.gridRowEnd}
-              </span>
-            </div>
-          );
-        })}
+                <span>{item.label}</span>
+                <span
+                  style={{
+                    fontSize: 11,
+                    opacity: 0.8,
+                    fontWeight: 400,
+                    marginTop: 2,
+                  }}
+                >
+                  col {item.gridColumnStart}/{item.gridColumnEnd}, row{" "}
+                  {item.gridRowStart}/{item.gridRowEnd}
+                </span>
+              </div>
+            );
+          })}
 
-        {/* Column resize handles — one at the right edge of each column. */}
-        {columns.map((col, i) => (
-          <div
-            key={`col-handle-${col.id}`}
-            data-testid={`col-resize-${col.id}`}
-            onPointerDown={(e) => onResizePointerDown(e, "columns", col)}
-            onPointerMove={onResizePointerMove}
-            onPointerUp={onResizePointerUp}
-            style={{
-              gridColumn: `${i + 1} / ${i + 2}`,
-              gridRow: "1 / -1",
-              justifySelf: "end",
-              width: 8,
-              marginRight: -4,
-              cursor: "col-resize",
-              touchAction: "none",
-              zIndex: 2,
-            }}
-          />
-        ))}
+          {/* Column resize handles — one at the right edge of each column. */}
+          {columns.map((col, i) => (
+            <div
+              key={`col-handle-${col.id}`}
+              data-testid={`col-resize-${col.id}`}
+              onPointerDown={(e) => onResizePointerDown(e, "columns", col)}
+              onPointerMove={onResizePointerMove}
+              onPointerUp={onResizePointerUp}
+              style={{
+                gridColumn: `${i + 1} / ${i + 2}`,
+                gridRow: "1 / -1",
+                justifySelf: "end",
+                width: 8,
+                marginRight: -4,
+                cursor: "col-resize",
+                touchAction: "none",
+                zIndex: 2,
+              }}
+            />
+          ))}
 
-        {/* Row resize handles — one at the bottom edge of each row. */}
-        {rows.map((row, i) => (
-          <div
-            key={`row-handle-${row.id}`}
-            data-testid={`row-resize-${row.id}`}
-            onPointerDown={(e) => onResizePointerDown(e, "rows", row)}
-            onPointerMove={onResizePointerMove}
-            onPointerUp={onResizePointerUp}
-            style={{
-              gridRow: `${i + 1} / ${i + 2}`,
-              gridColumn: "1 / -1",
-              alignSelf: "end",
-              height: 8,
-              marginBottom: -4,
-              cursor: "row-resize",
-              touchAction: "none",
-              zIndex: 2,
-            }}
-          />
-        ))}
+          {/* Row resize handles — one at the bottom edge of each row. */}
+          {rows.map((row, i) => (
+            <div
+              key={`row-handle-${row.id}`}
+              data-testid={`row-resize-${row.id}`}
+              onPointerDown={(e) => onResizePointerDown(e, "rows", row)}
+              onPointerMove={onResizePointerMove}
+              onPointerUp={onResizePointerUp}
+              style={{
+                gridRow: `${i + 1} / ${i + 2}`,
+                gridColumn: "1 / -1",
+                alignSelf: "end",
+                height: 8,
+                marginBottom: -4,
+                cursor: "row-resize",
+                touchAction: "none",
+                zIndex: 2,
+              }}
+            />
+          ))}
 
-        {preview && (
-          <div
-            data-testid="drag-preview"
-            style={{
-              gridColumn: `${preview.colStart} / ${preview.colEnd}`,
-              gridRow: `${preview.rowStart} / ${preview.rowEnd}`,
-              border: "2px dashed var(--color-accent)",
-              borderRadius: "var(--radius-md)",
-              backgroundColor: "var(--color-accent-bg)",
-              opacity: 0.7,
-              zIndex: 3,
-              pointerEvents: "none",
-            }}
-          />
-        )}
+          {preview && (
+            <div
+              data-testid="drag-preview"
+              style={{
+                gridColumn: `${preview.colStart} / ${preview.colEnd}`,
+                gridRow: `${preview.rowStart} / ${preview.rowEnd}`,
+                border: "2px dashed var(--color-accent)",
+                borderRadius: "var(--radius-md)",
+                backgroundColor: "var(--color-accent-bg)",
+                opacity: 0.7,
+                zIndex: 3,
+                pointerEvents: "none",
+              }}
+            />
+          )}
+        </div>
       </div>
     </section>
   );

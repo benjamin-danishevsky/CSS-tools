@@ -261,20 +261,52 @@ RED confirmed (dragMath failed at import; 8 CanvasDrag tests failed).
 ---
 
 ## Phase 7: Final pass
-**Date:**
-**Prompt:**
-**First output:**
-**Iterations:**
-**Time:**
-**Verdict:**
+**Date:** 2026-07-05
+**Prompt:** "commit with a detailed commit message and push, then go to the next phase"
+
+**Checklist (from BUILD_PROMPTS Phase 7):** end-to-end flow, copied-CSS correctness, keyboard accessibility, cross-panel sync, track-size labels, and console/lint cleanup.
+
+**Server constraint:** Playwright's config auto-starts a dev server, which conflicts with the standing "never start web server" rule. Resolution: get *executed* coverage of the full flow via an App-level integration test in jsdom (no server), and *write* the Playwright E2E spec as a runnable deliverable (`npm run test:e2e`) without executing it here.
+
+**First output (TDD — RED phase):**
+- `CanvasLabels.test.tsx` (4 tests): a size label per column and per row showing the track string, updating live, and showing "auto" for auto tracks
+- `App.integration.test.tsx` (3 tests): full UI-only build flow (change a column to 200px → add an item → span it → set gap) asserting the canvas inline styles AND the code-panel text update *together* (proves single-source-of-truth sync); preset load sync; toolbar undo reverting a sidebar change across panels
+
+RED: 4 label tests failed (feature missing) + 1 integration test failed.
+
+**Implementation & fixes:**
+- `Canvas.tsx` — wrapped the grid in a labeled layout: a column-label strip above and a row-label column beside the grid, each a mini CSS grid mirroring the main grid's tracks/gap so labels align. `grid-container` kept intact so all prior Canvas/drag tests stayed valid. Labels use a monospace font with `title` tooltips.
+- `index.css` — added a `:focus-visible` outline for all interactive controls (buttons/inputs/selects/[tabindex]) for WCAG 2.4.7 visible keyboard focus.
+- `tests/e2e/gridcraft.spec.ts` — Playwright specs for the build flow, preset+areas, clipboard copy, HTML export, dark-mode persistence, undo/redo, and keyboard reachability. Uses `.spec.ts` so Vitest (which globs `*.test.tsx`) ignores it and Playwright owns it.
+- Fixed one integration-test assertion: `getByText("Item 1")` was ambiguous because the item correctly appears in *both* the canvas and the sidebar list — scoped it to the canvas via `within(gridContainer)`. App behavior was correct; only the query was too broad.
+
+**Iterations:** 1 test-query fix (the ambiguous "Item 1"). Feature code passed first try.
+
+**Verification:**
+- `npm test` — 163/163 passed (7 new; the App integration test is the executed proof of the empty→complete flow and cross-panel sync)
+- `npm run typecheck` (tsc -b) — 0 errors
+- `npx oxlint` — exit 0 (no unused imports / no warnings)
+- `npm run build` — clean (221 KB JS)
+- Playwright E2E written but not executed (no-server rule); ready for `npm run test:e2e`.
+
+**Time:** ~15 minutes
+
+**Verdict:** The final pass closed every checklist item that can be verified without a live server, and left the E2E suite as a ready-to-run deliverable. The most useful decision was covering the "can I build a layout using only the UI, and do all panels stay in sync?" requirement with a jsdom App-integration test rather than deferring it entirely to Playwright — it runs in CI without a browser and directly asserts that the canvas and code panel derive identically from the store. The track-size labels were added without disturbing the existing Canvas/drag tests by wrapping rather than restructuring `grid-container`.
 
 ---
 
 ## Summary
 
-**Total build time:**
-**Phases that worked first-try:**
-**Phases that needed most iteration:**
-**Biggest surprise:**
-**Where I intervened manually:**
-**What I'd do differently:**
+**Total build time:** ~1h40m of Claude Code working time across 8 phases (0–7), spread over one session.
+
+**Phases that worked first-try:** Phase 2 (Canvas), Phase 5 (Toolbar), and Phase 6 (drag interactions) had zero iterations. Phases 1, 3, 4, and 7 each needed exactly one small fix — and in every case it was a *test-harness* issue (an over-broad assertion or a controlled-input/userEvent timing quirk), never a logic bug in the feature.
+
+**Phases that needed most iteration:** Phase 4 (Code panel) — not for the feature (all 18 tests passed first try) but because building it surfaced a *latent* circular type-inference bug in the Phase 1 store that had been hidden by an ineffective typecheck command.
+
+**Biggest surprise:** `npm run typecheck` running `tsc --noEmit` against a Vite solution-style root tsconfig (`files: []` + references) checks **zero files** — so a real type error lived undetected from Phase 1 until Phase 4's `npm run build` exposed it. Lesson: always type-check with `tsc -b`, and run the full build (not a shortcut) as part of verification. Fixed the script so every phase since is genuinely covered.
+
+**Where I intervened manually:** The build system chose React 19 over the spec's React 18 (kept it — backward compatible). Everything else followed the CLAUDE.md spec and the phase prompts.
+
+**What I'd do differently:** Run `npm run build` (not just `typecheck`) from Phase 0 onward, which would have caught the circular-type bug three phases earlier. Also, for interaction-heavy code (Phase 6), leading with the "extract pure geometry, keep DOM wiring thin" pattern from the start made jsdom's lack of layout a non-issue — worth adopting as the default approach for any drag/pointer feature.
+
+**Final state:** 163 automated tests (unit + component + integration) all green, a ready-to-run Playwright E2E suite, clean typecheck/lint/build, dark mode, undo/redo, presets, grid-template-areas, HTML export, drag-to-place, and boundary resizing — the full GridCraft spec delivered.
