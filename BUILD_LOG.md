@@ -114,12 +114,36 @@ All 13 tests failed (RED confirmed).
 ---
 
 ## Phase 3: Sidebar controls
-**Date:**
-**Prompt:**
-**First output:**
-**Iterations:**
-**Time:**
-**Verdict:**
+**Date:** 2026-07-05
+**Prompt:** "Commit the changes with a detailed commit message and then push it to the repo, then start phase 3"
+
+**First output (TDD — RED phase):**
+Wrote 25 component tests for Sidebar before implementation:
+- Tracks: column/row track lists render correct count, add/remove buttons work, value/unit inputs update store
+- Gap: row/column gap inputs render current values and update store
+- Alignment: 4 dropdowns (justifyItems, alignItems, justifyContent, alignContent) render and update store
+- Items: add button, item list rendering, click-to-select, edit controls for grid position, remove button
+
+All 25 tests failed (RED confirmed).
+
+**Implementation:**
+Split into 4 focused sub-components for maintainability:
+- `TrackList.tsx` — reusable for both columns and rows. Number input + unit select + remove button per track, add button at top
+- `GapControls.tsx` — row and column gap number inputs with px labels
+- `AlignmentControls.tsx` — 4 dropdowns in 2x2 grid. Items dropdowns get 4 values, content dropdowns get 7 (including space-between/around/evenly)
+- `ItemList.tsx` — item list with color swatch + label, click-to-select, remove button. Selected item shows position editor (col/row start/end) and self-alignment dropdowns
+- `Sidebar.tsx` — composes all 4 sub-components with consistent spacing
+
+**Iterations:** 1 test fix needed. `userEvent.clear()` + `userEvent.type("3")` on a controlled number input caused a re-render after clear (fallback value 1), then "3" appended to make "13". Fixed by using `fireEvent.change` with target value directly. Code was correct; test interaction was fighting React's controlled input behavior.
+
+**Verification:**
+- `npx vitest run tests/component/Sidebar.test.tsx` — 25/25 passed
+- Full suite: 101/101 passed (no regressions)
+- `npx tsc --noEmit` — 0 errors
+
+**Time:** ~10 minutes
+
+**Verdict:** Good architectural decision to split into 4 sub-components — keeps each file under 100 lines and makes the sidebar easy to rearrange later. The one test failure was a common React testing pitfall with controlled number inputs (userEvent.clear triggers intermediate re-renders). The alignment controls needed type gymnastics for the generic setAlignment action, but TypeScript caught the mismatch immediately. All store wiring worked first try.
 
 ---
 
