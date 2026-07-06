@@ -98,4 +98,33 @@ describe("CodePanel", () => {
       expect.stringContaining('<div class="container">'),
     );
   });
+
+  it("switches to the Explain tab and shows plain-English sentences", async () => {
+    render(<CodePanel />);
+    await userEvent.click(screen.getByTestId("tab-explain"));
+    const output = screen.getByTestId("code-output");
+    expect(output.textContent?.toLowerCase()).toContain("columns");
+    // Prose, not code:
+    expect(output.textContent).not.toContain("display: grid;");
+  });
+
+  it("updates the explanation live when the store changes", async () => {
+    render(<CodePanel />);
+    await userEvent.click(screen.getByTestId("tab-explain"));
+    const output = screen.getByTestId("code-output");
+    expect(output.textContent).toContain("3 equal columns");
+
+    act(() => {
+      useGridStore.getState().addColumn();
+    });
+
+    expect(output.textContent).toContain("4 equal columns");
+  });
+
+  it("hides the copy button on the Explain tab", async () => {
+    render(<CodePanel />);
+    expect(screen.getByTestId("copy-btn")).toBeInTheDocument();
+    await userEvent.click(screen.getByTestId("tab-explain"));
+    expect(screen.queryByTestId("copy-btn")).not.toBeInTheDocument();
+  });
 });

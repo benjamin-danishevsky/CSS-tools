@@ -1,4 +1,5 @@
 import { useGridStore } from "../../store/gridStore";
+import InfoTip from "../InfoTip";
 
 export default function GapControls() {
   const gap = useGridStore((s) => s.gap);
@@ -6,12 +7,15 @@ export default function GapControls() {
 
   return (
     <div>
-      <h3
-        className="mb-2 text-xs font-semibold uppercase tracking-wider"
-        style={{ color: "var(--color-text-muted)" }}
-      >
-        Gap
-      </h3>
+      <div className="mb-2 flex items-center gap-1.5">
+        <h3
+          className="text-xs font-semibold uppercase tracking-wider"
+          style={{ color: "var(--color-text-muted)" }}
+        >
+          Gap
+        </h3>
+        <InfoTip termKey="gap" />
+      </div>
       <div className="flex gap-3">
         <label className="flex flex-col gap-1">
           <span

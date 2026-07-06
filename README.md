@@ -41,6 +41,14 @@ Open [http://localhost:5173](http://localhost:5173).
 | `npm test` | Vitest unit/component tests |
 | `npm run test:e2e` | Playwright E2E tests |
 
+> **First-time E2E setup:** Playwright needs its browser binaries once before `npm run test:e2e` will run. Install them with:
+>
+> ```bash
+> npx playwright install chromium
+> ```
+>
+> The E2E command starts the Vite dev server automatically.
+
 ## How It Works
 
 Build a grid layout using the sidebar controls or by dragging on the canvas. The code panel updates live with valid CSS. When you're happy with the layout, copy the CSS (and optionally the HTML) into your project.

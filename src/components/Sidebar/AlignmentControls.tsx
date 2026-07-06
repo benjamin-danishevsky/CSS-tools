@@ -4,6 +4,8 @@ import type {
   ContentAlignmentValue,
   GridState,
 } from "../../types/grid";
+import InfoTip from "../InfoTip";
+import type { TermKey } from "../../lib/glossary";
 
 const ITEM_VALUES: AlignmentValue[] = ["start", "end", "center", "stretch"];
 const CONTENT_VALUES: ContentAlignmentValue[] = [
@@ -30,11 +32,14 @@ function AlignDropdown({ property, label }: AlignDropdownProps) {
 
   return (
     <label className="flex flex-col gap-1">
-      <span
-        className="text-[10px]"
-        style={{ color: "var(--color-text-secondary)" }}
-      >
-        {label}
+      <span className="flex items-center gap-1">
+        <span
+          className="text-[10px]"
+          style={{ color: "var(--color-text-secondary)" }}
+        >
+          {label}
+        </span>
+        <InfoTip termKey={label as TermKey} />
       </span>
       <select
         data-testid={`align-${property}`}

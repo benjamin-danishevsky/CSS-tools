@@ -1,5 +1,6 @@
 import { useGridStore } from "../../store/gridStore";
 import type { AlignmentValue } from "../../types/grid";
+import InfoTip from "../InfoTip";
 
 const SELF_VALUES: (AlignmentValue | "")[] = [
   "",
@@ -85,12 +86,15 @@ export default function ItemList() {
             border: "1px solid var(--color-border)",
           }}
         >
-          <h4
-            className="text-[10px] font-semibold uppercase tracking-wider"
-            style={{ color: "var(--color-text-muted)" }}
-          >
-            Position
-          </h4>
+          <div className="flex items-center gap-1.5">
+            <h4
+              className="text-[10px] font-semibold uppercase tracking-wider"
+              style={{ color: "var(--color-text-muted)" }}
+            >
+              Position
+            </h4>
+            <InfoTip termKey="grid-lines" />
+          </div>
           <div className="grid grid-cols-2 gap-2">
             <label className="flex flex-col gap-0.5">
               <span
@@ -194,12 +198,15 @@ export default function ItemList() {
             </label>
           </div>
 
-          <h4
-            className="mt-1 text-[10px] font-semibold uppercase tracking-wider"
-            style={{ color: "var(--color-text-muted)" }}
-          >
-            Self Alignment
-          </h4>
+          <div className="mt-1 flex items-center gap-1.5">
+            <h4
+              className="text-[10px] font-semibold uppercase tracking-wider"
+              style={{ color: "var(--color-text-muted)" }}
+            >
+              Self Alignment
+            </h4>
+            <InfoTip termKey="self-align" />
+          </div>
           <div className="grid grid-cols-2 gap-2">
             <label className="flex flex-col gap-0.5">
               <span

@@ -1,5 +1,6 @@
 import { useGridStore } from "../../store/gridStore";
 import type { TrackDefinition, TrackUnit } from "../../types/grid";
+import InfoTip from "../InfoTip";
 
 const UNITS: TrackUnit[] = ["fr", "px", "%", "auto"];
 
@@ -22,12 +23,15 @@ export default function TrackList({ type }: TrackListProps) {
   return (
     <div data-testid={`${type}-section`}>
       <div className="mb-2 flex items-center justify-between">
-        <h3
-          className="text-xs font-semibold uppercase tracking-wider"
-          style={{ color: "var(--color-text-muted)" }}
-        >
-          {label}
-        </h3>
+        <div className="flex items-center gap-1.5">
+          <h3
+            className="text-xs font-semibold uppercase tracking-wider"
+            style={{ color: "var(--color-text-muted)" }}
+          >
+            {label}
+          </h3>
+          {type === "columns" && <InfoTip termKey="units" />}
+        </div>
         <button
           data-testid={`add-${type === "columns" ? "column" : "row"}-btn`}
           onClick={() => addTrack()}

@@ -2,9 +2,10 @@ import { useMemo, useState } from "react";
 import { useGridStore } from "../../store/gridStore";
 import { generateCSS } from "../../lib/cssGenerator";
 import { generateHTML } from "../../lib/htmlGenerator";
+import { explainLayout } from "../../lib/explainLayout";
 import { highlightCSS } from "./highlight";
 
-type Tab = "css" | "html";
+type Tab = "css" | "html" | "explain";
 
 const MONO_FONT =
   "'Fira Code', 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace";
@@ -16,7 +17,8 @@ export default function CodePanel() {
 
   const css = useMemo(() => generateCSS(state), [state]);
   const html = useMemo(() => generateHTML(state), [state]);
-  const activeCode = tab === "css" ? css : html;
+  const explanation = useMemo(() => explainLayout(state), [state]);
+  const activeCode = tab === "html" ? html : css;
 
   async function handleCopy() {
     try {
@@ -45,14 +47,14 @@ export default function CodePanel() {
           style={{ backgroundColor: "var(--color-bg-tertiary)" }}
           role="tablist"
         >
-          {(["css", "html"] as const).map((t) => (
+          {(["css", "html", "explain"] as const).map((t) => (
             <button
               key={t}
               data-testid={`tab-${t}`}
               role="tab"
               aria-selected={tab === t}
               onClick={() => setTab(t)}
-              className="rounded-md px-3 py-1 text-xs font-semibold uppercase tracking-wide transition-colors"
+              className="rounded-md px-2.5 py-1 text-xs font-semibold uppercase tracking-wide transition-colors"
               style={{
                 backgroundColor: tab === t ? "var(--color-bg)" : "transparent",
                 color:
@@ -65,33 +67,55 @@ export default function CodePanel() {
           ))}
         </div>
 
-        <button
-          data-testid="copy-btn"
-          onClick={handleCopy}
-          className="rounded-md px-3 py-1.5 text-xs font-semibold transition-colors"
-          style={{
-            backgroundColor: copied
-              ? "var(--color-success)"
-              : "var(--color-accent)",
-            color: "#fff",
-          }}
-        >
-          {copied ? "Copied!" : `Copy ${tab.toUpperCase()}`}
-        </button>
+        {tab !== "explain" && (
+          <button
+            data-testid="copy-btn"
+            onClick={handleCopy}
+            className="rounded-md px-3 py-1.5 text-xs font-semibold transition-colors"
+            style={{
+              backgroundColor: copied
+                ? "var(--color-success)"
+                : "var(--color-accent)",
+              color: "#fff",
+            }}
+          >
+            {copied ? "Copied!" : `Copy ${tab.toUpperCase()}`}
+          </button>
+        )}
       </div>
 
       <div className="flex-1 overflow-auto p-3">
-        <pre
-          data-testid="code-output"
-          className="whitespace-pre text-xs leading-relaxed"
-          style={{
-            fontFamily: MONO_FONT,
-            color: "var(--color-text)",
-            margin: 0,
-          }}
-        >
-          <code>{tab === "css" ? highlightCSS(css) : html}</code>
-        </pre>
+        {tab === "explain" ? (
+          <ul
+            data-testid="code-output"
+            className="flex flex-col gap-2.5 text-[13px] leading-snug"
+            style={{ color: "var(--color-text-secondary)" }}
+          >
+            {explanation.map((sentence, i) => (
+              <li key={i} className="flex gap-2">
+                <span
+                  aria-hidden="true"
+                  style={{ color: "var(--color-accent)" }}
+                >
+                  •
+                </span>
+                <span>{sentence}</span>
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <pre
+            data-testid="code-output"
+            className="whitespace-pre text-xs leading-relaxed"
+            style={{
+              fontFamily: MONO_FONT,
+              color: "var(--color-text)",
+              margin: 0,
+            }}
+          >
+            <code>{tab === "css" ? highlightCSS(css) : html}</code>
+          </pre>
+        )}
       </div>
     </aside>
   );

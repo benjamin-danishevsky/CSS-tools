@@ -204,4 +204,32 @@ describe("Sidebar", () => {
       expect(useGridStore.getState().items).toHaveLength(0);
     });
   });
+
+  describe("info tooltips", () => {
+    it("shows a units explainer on the tracks section", () => {
+      render(<Sidebar />);
+      expect(screen.getByTestId("infotip-units")).toBeInTheDocument();
+    });
+
+    it("shows a gap explainer", () => {
+      render(<Sidebar />);
+      expect(screen.getByTestId("infotip-gap")).toBeInTheDocument();
+    });
+
+    it("shows an explainer on each alignment control", () => {
+      render(<Sidebar />);
+      expect(screen.getByTestId("infotip-justify-items")).toBeInTheDocument();
+      expect(screen.getByTestId("infotip-align-items")).toBeInTheDocument();
+      expect(screen.getByTestId("infotip-justify-content")).toBeInTheDocument();
+      expect(screen.getByTestId("infotip-align-content")).toBeInTheDocument();
+    });
+
+    it("shows grid-lines and self-align explainers for a selected item", () => {
+      useGridStore.getState().addItem();
+      useGridStore.getState().selectItem(useGridStore.getState().items[0].id);
+      render(<Sidebar />);
+      expect(screen.getByTestId("infotip-grid-lines")).toBeInTheDocument();
+      expect(screen.getByTestId("infotip-self-align")).toBeInTheDocument();
+    });
+  });
 });
