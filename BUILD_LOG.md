@@ -223,12 +223,40 @@ Wrote 14 component tests for Toolbar before implementation:
 ---
 
 ## Phase 6: Drag interactions
-**Date:**
-**Prompt:**
-**First output:**
-**Iterations:**
-**Time:**
-**Verdict:**
+**Date:** 2026-07-05
+**Prompt:** "commit with a detailed commit message and push, then go to the next phase"
+
+**The core challenge:** drag interactions depend on layout geometry (getBoundingClientRect, clientX/Y), but jsdom computes no layout — every rect is zero. Testing drag naively would mean either untestable code or brittle over-mocking.
+
+**Strategy:** push all real geometry into pure functions (`dragMath.ts`), keep the DOM wiring thin, and make boundary-resize *delta-based* (new value = f(startValue, clientX − startX)) so it needs no layout at all and is directly testable.
+
+**First output (TDD — RED phase):**
+- `dragMath.test.ts` (15 unit tests): findCellAtPoint (hit, miss, exclusive edges), clampStart (in-range, span overflow, below 1, beyond count, full-span), resizeTrackValue (px add+clamp, fr scaling+clamp, % container-mapping+clamp, auto no-op)
+- `CanvasDrag.test.tsx` (8 component tests): column/row resize handles render with correct count and resize cursors; dragging an fr column boundary +50px → 2fr; dragging a row boundary +100px → 3fr; item drag-to-place moves item to the dropped cell (with mocked cell rects); drag preview appears mid-drag
+
+RED confirmed (dragMath failed at import; 8 CanvasDrag tests failed).
+
+**Implementation:**
+- `dragMath.ts` — pure `findCellAtPoint` / `clampStart` / `resizeTrackValue` (unit-aware: px adds pixels, fr uses ~50px per 1fr, % maps to container fraction, auto unchanged)
+- `Canvas.tsx` — pointer-event wiring (no drag library):
+  - Item drag: onPointerDown arms a drag (records item + span in a ref), onPointerMove finds the cell under the cursor via the rendered cells' rects and sets a clamped preview, onPointerUp commits new grid-column/row. Drag state kept in refs (not state) to avoid stale closures; preview kept in state for rendering.
+  - Track resize: handles rendered as grid children pinned to each track's trailing edge (justify-self/align-self: end) with col-resize/row-resize cursors. Delta-based value update via resizeTrackValue.
+  - setPointerCapture/releasePointerCapture guarded (jsdom lacks them).
+  - Cells tagged with data-row/data-col so the pointer-to-cell lookup can reconstruct CellRects.
+  - Dashed accent preview overlay (data-testid="drag-preview") shows target cells during an item drag.
+
+**Iterations:** 0 — all 23 new tests passed on first implementation, and the 13 pre-existing Canvas tests stayed green (the added onPointerDown selection path is compatible with the existing click-to-select test).
+
+**Verification:**
+- `npx vitest run` (drag + existing Canvas) — 21/21
+- Full suite: 156/156 passed
+- `npm run typecheck` (tsc -b) — 0 errors
+- `npm run build` — clean (220 KB JS)
+- Live Playwright drag verification skipped per standing "never start web server" rule; pure-function coverage + mocked-rect component tests stand in.
+
+**Time:** ~20 minutes
+
+**Verdict:** The "extract the geometry, keep the wiring thin" approach paid off exactly as intended — the tricky logic (cell hit-testing, span clamping, unit-aware resizing) got exhaustive jsdom-independent coverage, and the delta-based resize made boundary dragging testable with plain fireEvent + clientX. The only real subtlety was avoiding stale-closure bugs in the pointer handlers, solved by holding drag state in refs and reading the commit target from the ref (not React state) on pointer-up. Zero iteration despite this being the most interaction-heavy phase.
 
 ---
 
