@@ -77,12 +77,39 @@ All 61 tests failed as expected (RED confirmed).
 ---
 
 ## Phase 2: Canvas
-**Date:**
-**Prompt:**
-**First output:**
-**Iterations:**
-**Time:**
-**Verdict:**
+**Date:** 2026-07-05
+**Prompt:** "start phase 2" (continued from Phase 1 commit+push)
+
+**First output (TDD — RED phase):**
+Wrote 13 component tests for Canvas before implementation:
+- Grid container renders with correct data-testid
+- Inline styles match store state (grid-template-columns/rows, gap, display:grid)
+- Grid items render with correct positioning, labels, position info, and colors
+- Empty cell placeholders render (3x3 = 9 cells)
+- Clicking an item selects it in the store
+- Updated track definitions reflect in container styles
+
+All 13 tests failed (RED confirmed).
+
+**Implementation:**
+- `Canvas.tsx` — real CSS grid container driven entirely by zustand store:
+  - Renders `data-testid="grid-container"` div with inline grid styles
+  - Empty cell overlay (dashed borders) for visual grid lines
+  - Grid items as colored divs with label + position text
+  - Selected item gets accent ring + shadow
+  - Click-to-select wired to store's selectItem action
+  - Uses `trackToString` from gridParser for track definitions
+
+**Iterations:** 0 — all 13 tests passed on first implementation.
+
+**Verification:**
+- `npx vitest run tests/component/Canvas.test.tsx` — 13/13 passed
+- Full suite: 76/76 passed (no regressions)
+- `npx tsc --noEmit` — 0 errors
+
+**Time:** ~5 minutes
+
+**Verdict:** Cleanest phase so far. Zero iteration needed. The component tests were well-matched to the implementation — every test corresponded directly to a rendered element or behavior. The key design decision was layering empty grid cells behind the items so grid lines are always visible. Using zustand selectors for each state slice keeps the component reactive and efficient.
 
 ---
 
